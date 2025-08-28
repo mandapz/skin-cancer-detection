@@ -146,7 +146,7 @@ def main():
         show_main_app()
 
 def show_auth_pages():
-    auth_tab1, auth_tab2, auth_tab3 = st.tabs(["🔑 Login", "📝 Register", "🔄 Reset Password"])
+    auth_tab1, auth_tab2, auth_tab3 = st.tabs(["🔐 Login", "📝 Register", "🔄 Reset Password"])
     
     with auth_tab1:
         show_login_page()
@@ -158,7 +158,7 @@ def show_auth_pages():
         show_reset_password_page()
 
 def show_login_page():
-    st.subheader("🔑 Login")
+    st.subheader("🔐 Login")
     
     with st.form("login_form"):
         username = st.text_input("Username")
@@ -360,7 +360,6 @@ def show_history_page():
     st.header("📈 Riwayat Deteksi")
     
     from datetime import datetime as dt
-    local_tz = pytz.timezone("Asia/Jakarta")
 
     if "delete_history_id" not in st.session_state:
         st.session_state.delete_history_id = None
@@ -371,11 +370,15 @@ def show_history_page():
         for record in history:
             try:
                 utc_dt = dt.strptime(record[4], "%Y-%m-%d %H:%M:%S")
-                utc_dt = utc_dt.replace(tzinfo=pytz.UTC)
-                local_dt = utc_dt.astimezone(local_tz)
-                waktu_str = local_dt.strftime("%d-%m-%Y %H:%M:%S WIB")
+                waktu_str = utc_dt.strftime("%d-%m-%Y")
             except Exception:
-                waktu_str = record[4]
+                try:
+                    waktu_str = record[4].split()[0] if record[4] else "Tanggal tidak tersedia"
+                    if len(waktu_str.split('-')) == 3:
+                        year, month, day = waktu_str.split('-')
+                        waktu_str = f"{day}-{month}-{year}"
+                except:
+                    waktu_str = "Tanggal tidak tersedia"
             
             with st.expander(f"📅 {waktu_str} - {record[2]}"):
                 col1, col2 = st.columns([2, 1])
@@ -421,7 +424,7 @@ def show_history_page():
             st.session_state.delete_history_id = None
             st.rerun()
     else:
-        st.info("📝 Belum ada riwayat deteksi. Silakan lakukan deteksi terlebih dahulu.")
+        st.info("📁 Belum ada riwayat deteksi. Silakan lakukan deteksi terlebih dahulu.")
 
 def show_account_info_page():
     st.header("👤 Informasi Akun")
@@ -429,12 +432,25 @@ def show_account_info_page():
     user_info = db_manager.get_user_info(st.session_state.username)
     
     if user_info:
+        # Format tanggal pembuatan akun tanpa jam
+        try:
+            creation_date = datetime.datetime.strptime(user_info[4], "%Y-%m-%d %H:%M:%S")
+            formatted_date = creation_date.strftime("%d-%m-%Y")
+        except:
+            try:
+                formatted_date = user_info[4].split()[0] if user_info[4] else "Tanggal tidak tersedia"
+                if len(formatted_date.split('-')) == 3:
+                    year, month, day = formatted_date.split('-')
+                    formatted_date = f"{day}-{month}-{year}"
+            except:
+                formatted_date = "Tanggal tidak tersedia"
+        
         st.markdown(f"""
         <div class="info-box">
             <strong>📋 Detail Akun:</strong><br>
             <strong>Nama Lengkap:</strong> {user_info[1]}<br>
             <strong>Username:</strong> {user_info[2]}<br>
-            <strong>Tanggal Pembuatan Akun:</strong> {user_info[4]}<br>
+            <strong>Tanggal Pembuatan Akun:</strong> {formatted_date}<br>
         </div>
         """, unsafe_allow_html=True)
         
