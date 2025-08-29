@@ -380,7 +380,7 @@ def show_history_page():
                 except:
                     waktu_str = "Tanggal tidak tersedia"
             
-            with st.expander(f"📅 {waktu_str} - {record[2]}"):
+            with st.expander(f"{waktu_str} - {record[2]}"):
                 col1, col2 = st.columns([2, 1])
                 with col1:
                     if os.path.exists(record[3]):
