@@ -128,7 +128,7 @@ def main():
         st.session_state.selected_menu = "🔍 Deteksi"
 
     # Header aplikasi
-    st.markdown('<h1 class="main-header">🔬 SkinGuard - Aplikasi Deteksi Kanker Kulit</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">🔬 SkinGuard 🔬 Aplikasi Deteksi Kanker Kulit</h1>', unsafe_allow_html=True)
     
     # Disclaimer
     st.markdown("""
